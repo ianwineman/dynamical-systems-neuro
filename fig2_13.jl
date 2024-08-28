@@ -78,7 +78,7 @@ begin
 	p1 = plot(
 		xs, 
 		[h∞_ys, n∞_ys, m∞_ys], 
-		label=[L"h∞(V)" "n∞(V)" "m∞(V)"],
+		label=[L"$h_∞(V)$" L"$n_∞(V)$" L"$m_∞(V)$"],
 		legend=:outertop,
 		legendcolumns=3,
 		xlabel=L"Membrane Potential $(mV)$",
@@ -92,7 +92,7 @@ begin
 	p2 = plot(
 		xs, 
 		[τh_ys, τn_ys, τm_ys], 
-		label=["τh(V)" "τn(V)" "τm(V)"],
+		label=[L"τ_h(V)" L"τ_n(V)" L"τ_m(V)"],
 		legend=:outertop,
 		legendcolumns=3,
 		xlabel=L"Membrane Potential $(mV)$",
