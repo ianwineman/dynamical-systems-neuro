@@ -64,20 +64,35 @@ function hodgkin_huxley!(du, u, p, t)
 	du[4] = (h∞(V) - h) / τh(V)
 end
 
-# ╔═╡ 4a11ba5a-29f0-470f-b395-26b9c13825dd
-@bind current_val NumberField(0:30, default=25)
+# ╔═╡ efdba351-00cd-45cb-bd13-f7fd1add5c78
+md"""
+1st Applied current start: $(@bind current1_start Slider(0:1:15, default=2; show_value=true)) \
+1st Applied current duration: $(@bind current1_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
+1st Applied current magnitude: $(@bind current1_val NumberField(0:1:30, default=8)) \
+\
+2nd Applied current start: $(@bind current2_start Slider(0:1:15, default=10; show_value=true)) \
+2nd Applied current duration: $(@bind current2_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
+2nd Applied current magnitude: $(@bind current2_val NumberField(0:1:30, default=25)) \
+"""
 
 # ╔═╡ 4252803d-5969-4c4b-8dd6-68404f7244ae
 # Applied current at time t in milliseconds
 function applied_current(t)  
 	# no applied current
-	if 0.0 <= t < 6.0
+	if 0.0 <= t < current1_start
 		return 0.0
 		
 	# applied current (depolarization)
-	elseif 6.0 <= t < 6.5
-		#return 8.0
-		return current_val
+	elseif current1_start <= t < current1_start + current1_dur
+		return current1_val
+		
+	# no applied current
+	elseif current1_start + current1_dur <= t < current2_start
+		return 0.0
+		
+	# applied current (depolarization)
+	elseif current2_start <= t < current2_start + current2_dur
+		return current2_val
 		
 	# no applied current
 	else
@@ -2008,6 +2023,6 @@ version = "1.4.1+1"
 # ╠═4252803d-5969-4c4b-8dd6-68404f7244ae
 # ╠═341f5ec9-3487-493c-b1d8-6336fe9c5e96
 # ╟─1d9ca4a1-6650-4463-b854-a8e7095283b8
-# ╠═4a11ba5a-29f0-470f-b395-26b9c13825dd
+# ╟─efdba351-00cd-45cb-bd13-f7fd1add5c78
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
