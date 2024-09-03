@@ -5,7 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 84b266be-67af-11ef-1778-ff0700e4d9f5
-using Plots, DifferentialEquations, LaTeXStrings
+using Plots, DifferentialEquations
 
 # ╔═╡ 52b178de-a353-4a38-8dda-5d151c959114
 function hodgkin_huxley!(du, u, p, t)
@@ -93,7 +93,10 @@ begin
 end
 
 # ╔═╡ ad0f9166-8231-41c9-a675-03e61b6bc5c2
-solution = solve(model)
+begin
+	solution = solve(model)
+	nothing # remove this line to display solution table
+end
 
 # ╔═╡ a3500362-827a-4802-9804-1c587964b862
 begin
@@ -101,41 +104,49 @@ begin
 		solution, 
 		idxs = (0,1), # (time, membrane potential)
 		linewidth=2, 
-		label=:none,
+		color=:blue,
 		xguide="",
-		ylabel=L"Membrane Potential $(mV)$",
-		yguidefontsize=8
+		yguide="",
+		legendtitle="Membrane Potential (mV)",
+		legendtitlefontsize=6,
+		legendposition=:topleft,
+		label="V(t)",
+		legendfontsize=6
 	)
 
 	p2 = plot(
 		solution, 
 		idxs = [(0,2), (0,3), (0,4)], # [(t, n), (t, m), (t, h)]
-		linewidth=2, 
-		label=[L"$n(t)$" L"$m(t)$" L"$h(t)$"],
-		legend=:outertop,
-		legendcolumns=3,
+		color=[:purple :orange :green],
 		xguide="",
-		ylabel=L"Membrane Potential $(mV)$",
-		yguidefontsize=8
+		yguide="",
+		legendtitle="Gating Variables",
+		legendtitlefontsize=6,
+		legendposition=:topleft,
+		label=["n(t)" "m(t)" "h(t)"],
+		legendfontsize=6
 	)
 
 	p3 = plot(
 		collect(0.0:0.01:20.0),
 		[applied_current(i) for i=collect(0.0:0.01:20.0)],
-		linewidth=2, 
-		label=:none,
-		xlabel=L"time $(ms)$",
-		xguidefontsize=8,
-		ylabel=L"Applied current $(μA/cm^2)$",
-		yguidefontsize=8
+		linewidth=2,
+		color=:red,
+		xguide="time (ms)",
+		yguide="",
+		legendtitle="Applied current (μA/cm²)",
+		legendtitlefontsize=6,
+		legendposition=:topleft,
+		label="I(t)",
+		legendfontsize=6
 	)
 
 	plot(
 		p1, p2, p3, 
-		layout=(3,1), 
-		plot_title="Figure 2.15",
+		layout=grid(3, 1, heights=[6//10, 2//10, 2//10]), 
+		plot_title="Hodgkin-Huxley Model",
 		plot_titlefontsize=12,
-		size=(600,1000)
+		size=(900,600)
 	)
 end
 
@@ -143,12 +154,10 @@ end
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
-LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
 DifferentialEquations = "~7.10.0"
-LaTeXStrings = "~1.3.1"
 Plots = "~1.40.5"
 """
 
@@ -158,7 +167,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "d0a0a4c64293ed838f5c27053ecfc2d0088b625a"
+project_hash = "8150334f83ae4f0313c80981456084c3e3bb7103"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "016833eb52ba2d6bea9fcb50ca295980e728ee24"
@@ -1956,6 +1965,6 @@ version = "1.4.1+1"
 # ╠═971e4f09-3bf5-4147-b1c0-dba6fb885082
 # ╠═8893ddaf-89c3-4811-9d0a-1ee804c022b6
 # ╠═ad0f9166-8231-41c9-a675-03e61b6bc5c2
-# ╠═a3500362-827a-4802-9804-1c587964b862
+# ╟─a3500362-827a-4802-9804-1c587964b862
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
