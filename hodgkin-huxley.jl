@@ -4,10 +4,20 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 84b266be-67af-11ef-1778-ff0700e4d9f5
-using Plots, DifferentialEquations
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
 
-# ╔═╡ 52b178de-a353-4a38-8dda-5d151c959114
+# ╔═╡ b2e8a368-6a39-11ef-158c-6540521cce3c
+using Plots, DifferentialEquations, PlutoUI
+
+# ╔═╡ c38c8379-e547-4b23-842a-20cd8e479de2
 function hodgkin_huxley!(du, u, p, t)
 	# Voltage, K+ activation, Na+ activation, Na+ inactivation
 	V, n, m, h = u 
@@ -54,24 +64,20 @@ function hodgkin_huxley!(du, u, p, t)
 	du[4] = (h∞(V) - h) / τh(V)
 end
 
-# ╔═╡ 971e4f09-3bf5-4147-b1c0-dba6fb885082
+# ╔═╡ 4a11ba5a-29f0-470f-b395-26b9c13825dd
+@bind current_val NumberField(0:30, default=25)
+
+# ╔═╡ 4252803d-5969-4c4b-8dd6-68404f7244ae
 # Applied current at time t in milliseconds
 function applied_current(t)  
 	# no applied current
-	if 0.0 <= t < 2.0
+	if 0.0 <= t < 6.0
 		return 0.0
 		
-	# applied current (small depolarization)
-	elseif 2.0 <= t < 2.5
-		return 8.0
-		
-	# no applied current
-	elseif 2.5 <= t < 10.0
-		return 0.0
-		
-	# applied current (large depolarization)
-	elseif 10.0 <= t < 10.5
-		return 25.0
+	# applied current (depolarization)
+	elseif 6.0 <= t < 6.5
+		#return 8.0
+		return current_val
 		
 	# no applied current
 	else
@@ -79,7 +85,7 @@ function applied_current(t)
 	end
 end
 
-# ╔═╡ 8893ddaf-89c3-4811-9d0a-1ee804c022b6
+# ╔═╡ 341f5ec9-3487-493c-b1d8-6336fe9c5e96
 begin
 	# Initial values:
 	#   Vrest        n(0) = n∞(0)         m(0) = m∞(0)        h(0) = h∞(0)
@@ -90,15 +96,12 @@ begin
 
 	# Build model
 	model = ODEProblem(hodgkin_huxley!, u0, timespan, applied_current)
-end
 
-# ╔═╡ ad0f9166-8231-41c9-a675-03e61b6bc5c2
-begin
+	# Solve model
 	solution = solve(model)
-	nothing # remove this line to display solution table
 end
 
-# ╔═╡ a3500362-827a-4802-9804-1c587964b862
+# ╔═╡ 1d9ca4a1-6650-4463-b854-a8e7095283b8
 begin
 	p1 = plot(
 		solution, 
@@ -111,7 +114,8 @@ begin
 		legendtitlefontsize=6,
 		legendposition=:topleft,
 		label="V(t)",
-		legendfontsize=6
+		legendfontsize=6,
+		ylims=(-20,130)
 	)
 
 	p2 = plot(
@@ -124,7 +128,8 @@ begin
 		legendtitlefontsize=6,
 		legendposition=:topleft,
 		label=["n(t)" "m(t)" "h(t)"],
-		legendfontsize=6
+		legendfontsize=6,
+		ylims=(0,1)
 	)
 
 	p3 = plot(
@@ -138,7 +143,8 @@ begin
 		legendtitlefontsize=6,
 		legendposition=:topleft,
 		label="I(t)",
-		legendfontsize=6
+		legendfontsize=6,
+		ylims=(0,30)
 	)
 
 	plot(
@@ -155,10 +161,12 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 DifferentialEquations = "~7.10.0"
 Plots = "~1.40.5"
+PlutoUI = "~0.7.60"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -167,12 +175,18 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "8150334f83ae4f0313c80981456084c3e3bb7103"
+project_hash = "0cafb1610868e548cb0e9e00a5250a7a60ff29b1"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "016833eb52ba2d6bea9fcb50ca295980e728ee24"
 uuid = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
 version = "0.2.7"
+
+[[deps.AbstractPlutoDingetjes]]
+deps = ["Pkg"]
+git-tree-sha1 = "6e1d2a35f2f90a4bc7c2ed98079b2ba09c35b83a"
+uuid = "6e696c72-6542-2067-7265-42206c756150"
+version = "1.3.2"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra", "Requires"]
@@ -698,6 +712,24 @@ git-tree-sha1 = "7c4195be1649ae622304031ed46a2f4df989f1eb"
 uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 version = "0.3.24"
 
+[[deps.Hyperscript]]
+deps = ["Test"]
+git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
+uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
+version = "0.0.5"
+
+[[deps.HypertextLiteral]]
+deps = ["Tricks"]
+git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.5"
+
+[[deps.IOCapture]]
+deps = ["Logging", "Random"]
+git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
+uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
+version = "0.2.5"
+
 [[deps.IfElse]]
 git-tree-sha1 = "debdd00ffef04665ccbb3e150747a77560e8fad1"
 uuid = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"
@@ -940,6 +972,11 @@ git-tree-sha1 = "8084c25a250e00ae427a379a5b607e7aed96a2dd"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
 version = "0.12.171"
 
+[[deps.MIMEs]]
+git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "0.1.4"
+
 [[deps.MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "oneTBB_jll"]
 git-tree-sha1 = "f046ccd0c6db2832a9f639e2c669c6fe867e5f4f"
@@ -1166,6 +1203,12 @@ deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers"
 git-tree-sha1 = "082f0c4b70c202c37784ce4bfbc33c9f437685bf"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.40.5"
+
+[[deps.PlutoUI]]
+deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
+git-tree-sha1 = "eba4810d5e6a01f612b948c9fa94f905b49087b0"
+uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+version = "0.7.60"
 
 [[deps.PoissonRandom]]
 deps = ["Random"]
@@ -1960,11 +2003,11 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
-# ╠═84b266be-67af-11ef-1778-ff0700e4d9f5
-# ╠═52b178de-a353-4a38-8dda-5d151c959114
-# ╠═971e4f09-3bf5-4147-b1c0-dba6fb885082
-# ╠═8893ddaf-89c3-4811-9d0a-1ee804c022b6
-# ╠═ad0f9166-8231-41c9-a675-03e61b6bc5c2
-# ╠═a3500362-827a-4802-9804-1c587964b862
+# ╠═b2e8a368-6a39-11ef-158c-6540521cce3c
+# ╠═c38c8379-e547-4b23-842a-20cd8e479de2
+# ╠═4252803d-5969-4c4b-8dd6-68404f7244ae
+# ╠═341f5ec9-3487-493c-b1d8-6336fe9c5e96
+# ╟─1d9ca4a1-6650-4463-b854-a8e7095283b8
+# ╠═4a11ba5a-29f0-470f-b395-26b9c13825dd
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
