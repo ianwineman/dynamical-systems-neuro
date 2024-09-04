@@ -102,6 +102,9 @@ begin
 	plot(p1, p2, layout=(1,2), size=(800,400))
 end
 
+# ╔═╡ c56d0c46-df93-4e85-8d2b-2fd4efa97566
+savefig("fig2_13.png")
+
 # ╔═╡ Cell order:
 # ╠═a7f1f63e-6580-11ef-2441-9d653a53d4b4
 # ╠═fc3eb03c-2093-4db8-a5f6-58e6d4f9e7c4
@@ -117,3 +120,4 @@ end
 # ╠═1e6375b6-0ccf-4789-b5e8-48cfc5622648
 # ╠═50e52bc2-42cb-4698-81db-86ee5860f2fc
 # ╠═42be9015-6597-4af9-b7e4-2ee1a281a0d5
+# ╠═c56d0c46-df93-4e85-8d2b-2fd4efa97566

@@ -4,187 +4,114 @@
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
-        el
-    end
-end
+# ╔═╡ f1a20b5a-6ad2-11ef-3f64-933408366557
+using Plots, DifferentialEquations, LaTeXStrings
 
-# ╔═╡ b2e8a368-6a39-11ef-158c-6540521cce3c
-using Plots, DifferentialEquations, PlutoUI
-
-# ╔═╡ c38c8379-e547-4b23-842a-20cd8e479de2
-function hodgkin_huxley!(du, u, p, t)
+# ╔═╡ 08b1f3eb-baa9-4a11-ba9e-4eb27f916df4
+function persistent_sodium!(du, u, p, t)
 	# Voltage, K+ activation, Na+ activation, Na+ inactivation
-	V, n, m, h = u 
+	V = u[1]
 
 	# Maximal conductances and Equilibrium potentials
-	gK, gNa, gL, EK, ENa, EL = [36, 120, 0.3, -12, 120, 10.6]
+	C, gL, EL, gNa, Vhalf, k, ENa = [10, 19, -67, 74, 1.5, 16, 60]
 	
 	# Applied current
 	I = p
 
 	# note v ≢ V
-	# Activation variable n
-	αn(v) = (0.01 * (10.0 - v)) / (exp((10.0 - v) / 10.0) - 1.0)
-	βn(v) = 0.125 * exp(-v / 80.0)
-	n∞(v) = αn(v) / (αn(v) + βn(v))
-	τn(v) = 1.0  / (αn(v) + βn(v))
-
-	
-	# Activation variable m
-	αm(v) = (0.1 * (25.0 - v)) / (exp((25.0 - v) / 10.0) - 1.0)
-	βm(v) = 4.0 * exp(-v / 18.0)
-	m∞(v) = αm(v) / (αm(v) + βm(v))
-	τm(v) = 1.0  / (αm(v) + βm(v))
-
-
-	# Inactivation variable h
-	αh(v) = 0.07 * exp(-v / 20.0)
-	βh(v) = 1 / (exp((30.0 - v) / 10.0) + 1.0)
-	h∞(v) = αh(v) / (αh(v) + βh(v))
-	τh(v) = 1.0  / (αh(v) + βh(v))
-
+	m∞(v) = 1.0 / (1 + exp((Vhalf - v) / k))
 
 	# System of equations:
-	# dV/dt I      ------- IK --------   ---------- INa ----------   ---- IL -----
-    du[1] = I(t) - gK * n^4 * (V - EK) - gNa * m^3 * h * (V - ENa) - gL * (V - EL)
-
-	# dn/dt
-	du[2] = (n∞(V) - n) / τn(V)
-
-	# dm/dt
-    du[3] = (m∞(V) - m) / τm(V)
-
-	# dh/dt
-	du[4] = (h∞(V) - h) / τh(V)
+	# dV/dt  I      ---- IL -----   ---------- INa ----------
+    du[1] = (I(t) - gL * (V - EL) - gNa * m∞(V) * (V - ENa)) / C
 end
 
-# ╔═╡ efdba351-00cd-45cb-bd13-f7fd1add5c78
-md"""
-``1^{\text{st}}`` Applied current start: $(@bind current1_start Slider(0:1:15, default=2; show_value=true)) \
-``1^{\text{st}}`` Applied current duration: $(@bind current1_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
-``1^{\text{st}}`` Applied current magnitude: $(@bind current1_val NumberField(0:1:30, default=8)) \
-\
-``2^{\text{nd}}`` Applied current start: $(@bind current2_start Slider(0:1:15, default=10; show_value=true)) \
-``2^{\text{nd}}`` Applied current duration: $(@bind current2_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
-``2^{\text{nd}}`` Applied current magnitude: $(@bind current2_val NumberField(0:1:30, default=25)) \
-"""
+# ╔═╡ b88edea5-8523-4e17-b9c9-3dac8bd20bcb
+begin
+	# Timespan in milliseconds
+	timespan = (0.0, 5.0)  
 
-# ╔═╡ 4252803d-5969-4c4b-8dd6-68404f7244ae
-# Applied current at time t in milliseconds
-function applied_current(t)  
-	# no applied current
-	if 0.0 <= t < current1_start
-		return 0.0
-		
-	# applied current (depolarization)
-	elseif current1_start <= t < current1_start + current1_dur
-		return current1_val
-		
-	# no applied current
-	elseif current1_start + current1_dur <= t < current2_start
-		return 0.0
-		
-	# applied current (depolarization)
-	elseif current2_start <= t < current2_start + current2_dur
-		return current2_val
-		
-	# no applied current
-	else
-		return 0.0
+	bistable_solutions = []
+	monostable_solutions = []
+
+	for u0=-60:5:40
+		# Bistable models (I=0)
+		## Build model
+		model_bi = ODEProblem(persistent_sodium!, [u0], timespan, t -> 0)
+	
+		## Solve model
+		solution_bi = solve(model_bi, saveat=0.0:0.1:5.0)
+		push!(bistable_solutions, solution_bi)
+	
+		# Monostable models (I=60)
+		## Build model
+		model_mono = ODEProblem(persistent_sodium!, [u0], timespan, t -> 60)
+	
+		## Solve model
+		solution_mono = solve(model_mono, saveat=0.0:0.1:5.0)
+		push!(monostable_solutions, solution_mono)
 	end
 end
 
-# ╔═╡ 341f5ec9-3487-493c-b1d8-6336fe9c5e96
-begin
-	# Initial values:
-	#   Vrest        n(0) = n∞(0)         m(0) = m∞(0)        h(0) = h∞(0)
-	u0 = [0.0, 0.3176769140606974, 0.05293248525724958, 0.5961207535084603]
-
-	# Timespan in milliseconds
-	timespan = (0.0, 20.0)  
-
-	# Build model
-	model = ODEProblem(hodgkin_huxley!, u0, timespan, applied_current)
-
-	# Solve model
-	solution = solve(model)
-end
-
-# ╔═╡ 1d9ca4a1-6650-4463-b854-a8e7095283b8
+# ╔═╡ f5d01921-be6a-4b1e-9a44-3382ff64a2e5
 begin
 	p1 = plot(
-		solution, 
-		idxs = (0,1), # (time, membrane potential)
-		linewidth=2, 
+		[bistable_solutions[i].t for i=1:length(bistable_solutions)], 
+		[vcat(bistable_solutions[i].u...) for i=1:length(bistable_solutions)],
+		title="bistability (I=0)",
+		titlefontsize=10,
+		label=:none,
 		color=:blue,
-		xguide="",
-		yguide="",
-		legendtitle="Membrane Potential (mV)",
-		legendtitlefontsize=6,
-		legendposition=:topleft,
-		label="V(t)",
-		legendfontsize=6,
-		ylims=(-20,130)
-	)
-
-	p2 = plot(
-		solution, 
-		idxs = [(0,2), (0,3), (0,4)], # [(t, n), (t, m), (t, h)]
-		color=[:purple :orange :green],
-		xguide="",
-		yguide="",
-		legendtitle="Gating Variables",
-		legendtitlefontsize=6,
-		legendposition=:topleft,
-		label=["n(t)" "m(t)" "h(t)"],
-		legendfontsize=6,
-		ylims=(0,1)
-	)
-
-	p3 = plot(
-		collect(0.0:0.01:20.0),
-		[applied_current(i) for i=collect(0.0:0.01:20.0)],
-		linewidth=2,
-		color=:red,
 		xguide="time (ms)",
-		yguide="",
-		legendtitle="Applied current (μA/cm²)",
-		legendtitlefontsize=6,
-		legendposition=:topleft,
-		label="I(t)",
-		legendfontsize=6,
-		ylims=(0,30)
+		xguidefontsize=8,
+		yguide="membrane potential, V (mV)",
+		yguidefontsize=8,
+		ylims=(-60,40),
+		annotations = [
+			(4.05, 34, ("excited", :left, 10)), 
+			(4.05, -47, ("resting", :left, 10))
+		]
 	)
-
+	
+	p2 = plot(
+		[monostable_solutions[i].t for i=1:length(monostable_solutions)], 
+		[vcat(monostable_solutions[i].u...) for i=1:length(monostable_solutions)],
+		title="monostability (I=60)",
+		titlefontsize=10,
+		label=:none,
+		color=:blue,
+		xguide="time (ms)",
+		xguidefontsize=8,
+		yguide="membrane potential, V (mV)",
+		yguidefontsize=8,
+		ylims=(-60,40),
+		annotations = [
+			(4.05, 34, ("excited", :left, 10))
+		]
+	)
+	
 	plot(
-		p1, p2, p3, 
-		layout=grid(3, 1, heights=[6//10, 2//10, 2//10]), 
-		plot_title="Hodgkin-Huxley Model",
-		plot_titlefontsize=12,
-		size=(900,600)
-	)
+			p1, p2, 
+			plot_title=L"Figure 3.6, $I_{\mathrm{Na,p}}$-model",
+			plot_titlefontsize=12,
+			size=(800,400)
+		)
 end
 
-# ╔═╡ ed514b81-a5ef-4bf1-8083-e07e89ca6dab
-savefig("hodgkin-huxley.png")
+# ╔═╡ c0225f76-0123-4b2d-a11a-0899b784c297
+savefig("fig3_6.png")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 DifferentialEquations = "~7.10.0"
+LaTeXStrings = "~1.3.1"
 Plots = "~1.40.5"
-PlutoUI = "~0.7.60"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -193,18 +120,12 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "0cafb1610868e548cb0e9e00a5250a7a60ff29b1"
+project_hash = "d0a0a4c64293ed838f5c27053ecfc2d0088b625a"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "016833eb52ba2d6bea9fcb50ca295980e728ee24"
 uuid = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
 version = "0.2.7"
-
-[[deps.AbstractPlutoDingetjes]]
-deps = ["Pkg"]
-git-tree-sha1 = "6e1d2a35f2f90a4bc7c2ed98079b2ba09c35b83a"
-uuid = "6e696c72-6542-2067-7265-42206c756150"
-version = "1.3.2"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra", "Requires"]
@@ -730,24 +651,6 @@ git-tree-sha1 = "7c4195be1649ae622304031ed46a2f4df989f1eb"
 uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 version = "0.3.24"
 
-[[deps.Hyperscript]]
-deps = ["Test"]
-git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
-uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
-version = "0.0.5"
-
-[[deps.HypertextLiteral]]
-deps = ["Tricks"]
-git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
-uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.5"
-
-[[deps.IOCapture]]
-deps = ["Logging", "Random"]
-git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
-uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.5"
-
 [[deps.IfElse]]
 git-tree-sha1 = "debdd00ffef04665ccbb3e150747a77560e8fad1"
 uuid = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"
@@ -990,11 +893,6 @@ git-tree-sha1 = "8084c25a250e00ae427a379a5b607e7aed96a2dd"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
 version = "0.12.171"
 
-[[deps.MIMEs]]
-git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
-uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
-version = "0.1.4"
-
 [[deps.MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "oneTBB_jll"]
 git-tree-sha1 = "f046ccd0c6db2832a9f639e2c669c6fe867e5f4f"
@@ -1221,12 +1119,6 @@ deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers"
 git-tree-sha1 = "082f0c4b70c202c37784ce4bfbc33c9f437685bf"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.40.5"
-
-[[deps.PlutoUI]]
-deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "eba4810d5e6a01f612b948c9fa94f905b49087b0"
-uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.60"
 
 [[deps.PoissonRandom]]
 deps = ["Random"]
@@ -2021,12 +1913,10 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
-# ╠═b2e8a368-6a39-11ef-158c-6540521cce3c
-# ╠═c38c8379-e547-4b23-842a-20cd8e479de2
-# ╠═4252803d-5969-4c4b-8dd6-68404f7244ae
-# ╠═341f5ec9-3487-493c-b1d8-6336fe9c5e96
-# ╠═1d9ca4a1-6650-4463-b854-a8e7095283b8
-# ╟─efdba351-00cd-45cb-bd13-f7fd1add5c78
-# ╠═ed514b81-a5ef-4bf1-8083-e07e89ca6dab
+# ╠═f1a20b5a-6ad2-11ef-3f64-933408366557
+# ╠═08b1f3eb-baa9-4a11-ba9e-4eb27f916df4
+# ╠═b88edea5-8523-4e17-b9c9-3dac8bd20bcb
+# ╠═f5d01921-be6a-4b1e-9a44-3382ff64a2e5
+# ╠═c0225f76-0123-4b2d-a11a-0899b784c297
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
