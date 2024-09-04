@@ -7,7 +7,7 @@
 ![Figure 2.13](https://raw.githubusercontent.com/ianwineman/dynamical-systems-neuro/main/fig3_6.png)
 
 ## Hodgkin-Huxley Model
-[Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/hogdkin-huxley.jl)
+[Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/hodgkin-huxley.jl)
 
 ![Figure 2.13](https://raw.githubusercontent.com/ianwineman/dynamical-systems-neuro/main/hodgkin-huxley.png)
 
