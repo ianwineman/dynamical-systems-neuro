@@ -66,13 +66,13 @@ end
 
 # ╔═╡ efdba351-00cd-45cb-bd13-f7fd1add5c78
 md"""
-1st Applied current start: $(@bind current1_start Slider(0:1:15, default=2; show_value=true)) \
-1st Applied current duration: $(@bind current1_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
-1st Applied current magnitude: $(@bind current1_val NumberField(0:1:30, default=8)) \
+``1^{\text{st}}`` Applied current start: $(@bind current1_start Slider(0:1:15, default=2; show_value=true)) \
+``1^{\text{st}}`` Applied current duration: $(@bind current1_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
+``1^{\text{st}}`` Applied current magnitude: $(@bind current1_val NumberField(0:1:30, default=8)) \
 \
-2nd Applied current start: $(@bind current2_start Slider(0:1:15, default=10; show_value=true)) \
-2nd Applied current duration: $(@bind current2_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
-2nd Applied current magnitude: $(@bind current2_val NumberField(0:1:30, default=25)) \
+``2^{\text{nd}}`` Applied current start: $(@bind current2_start Slider(0:1:15, default=10; show_value=true)) \
+``2^{\text{nd}}`` Applied current duration: $(@bind current2_dur Slider(0.3:0.01:1, default=0.5; show_value=true)) \
+``2^{\text{nd}}`` Applied current magnitude: $(@bind current2_val NumberField(0:1:30, default=25)) \
 """
 
 # ╔═╡ 4252803d-5969-4c4b-8dd6-68404f7244ae
