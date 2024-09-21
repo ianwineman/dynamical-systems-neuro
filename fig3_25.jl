@@ -9,7 +9,7 @@ using Plots, DifferentialEquations, LaTeXStrings, Measures
 
 # ╔═╡ 838aeab2-6fa0-42cd-bc04-ed558d1773dc
 function persistent_sodium!(du, u, p, t)
-	# Voltage, K+ activation, Na+ activation, Na+ inactivation
+	# Voltage, Na+ activation
 	V = u[1]
 
 	# Maximal conductances and Equilibrium potentials
