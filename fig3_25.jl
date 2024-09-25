@@ -174,10 +174,12 @@ begin
 		ylims=(-60,40),
 		annotations = [
 			(4.05, 36, ("excited", :left, 8)), 
-			(4.05, -45, ("resting", :left, 8))
+			(4.05, -46, ("resting", :left, 8)),
+			(3.67, -38, ("threshold", :left, 8))
 		],
 		leftmargin=10mm
 	)
+	hline!([-42], linestyle=:dash, color=:black, label=:none)
 	
 	p5 = plot(
 		[bifurcation_solutions[i].t for i=1:length(bifurcation_solutions)], 
@@ -195,6 +197,7 @@ begin
 		],
 		leftmargin=10mm
 	)
+	hline!([-43], linestyle=:dash, color=:black, label=:none)
 
 	p6 = plot(
 		[monostable_solutions[i].t for i=1:length(monostable_solutions)], 
