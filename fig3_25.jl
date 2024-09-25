@@ -35,7 +35,7 @@ begin
 	bifurcation_solutions = []
 	monostable_solutions = []
 
-	for u0=-60:5:40
+	for u0=-60:5.1:40
 		# Bistable models (I=0)
 		## Build model
 		model_bi = ODEProblem(persistent_sodium!, [u0], timespan, t -> 0)
@@ -93,7 +93,12 @@ begin
 			(-42, 0, ("○", :left, 8)),
 			(-37, -7, ("threshold", :left, 8)),
 			(29.5, 0, ("●", :left, 6)),
-			(34, -7, ("excited", :left, 8))
+			(34, -7, ("excited", :left, 8)),
+			(15.3, 1, ("▶", :left, 8, :blue)),
+			(40.3, 1, ("◀", :left, 8, :blue)),
+			(-62, 1, ("▶", :left, 8, :blue)),
+			(-25, 1, ("▶", :left, 8, :blue)),
+			(-48, 1, ("◀", :left, 8, :blue))
 		]
 	)
 
@@ -119,7 +124,11 @@ begin
 			(-48.5, 0, ("◐", :left, 8)),
 			(-44, -7, ("tangent point", :left, 8)),
 			(29.6, 0, ("●", :left, 6)),
-			(35, -7, ("excited", :left, 8))
+			(35, -7, ("excited", :left, 8)),
+			(15.3, 1, ("▶", :left, 8, :blue)),
+			(40.3, 1, ("◀", :left, 8, :blue)),
+			(-60, 1, ("▶", :left, 8, :blue)),
+			(-25, 1, ("▶", :left, 8, :blue))
 		]
 	)
 
@@ -144,7 +153,11 @@ begin
 		ylims=(-20,100),
 		annotations = [
 			(30.3, 0, ("●", :left, 6)),
-			(36, -7, ("excited", :left, 8))
+			(36, -7, ("excited", :left, 8)),
+			(15.3, 1, ("▶", :left, 8, :blue)),
+			(40.3, 1, ("◀", :left, 8, :blue)),
+			(-50, 1, ("▶", :left, 8, :blue)),
+			(-25, 1, ("▶", :left, 8, :blue))
 		]
 	)
 	
