@@ -22,7 +22,7 @@ function persistent_sodium!(du, u, p, t)
 	m∞(v) = 1.0 / (1 + exp((Vhalf - v) / k))
 
 	# System of equations:
-	# dV/dt  I      ---- IL -----   ---------- INa ----------
+	# dV/dt  I      ---- IL -----   ---------- INa ---------
     du[1] = (I(t) - gL * (V - EL) - gNa * m∞(V) * (V - ENa)) / C
 end
 
