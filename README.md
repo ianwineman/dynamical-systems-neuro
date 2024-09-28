@@ -7,7 +7,9 @@
 ![Figure 3.33](fig3_33.png)
 
 ## Figure 3.32
-Coming soon!
+[Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/fig3_32.jl)
+
+![Figure 3.32](fig3_32.png)
 
 ## Figure 3.31
 [Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/fig3_31.jl)
