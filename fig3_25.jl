@@ -218,13 +218,13 @@ begin
 	)
 	
 	plot(
-			p1, p4, p2,
-			p5, p3, p6,
-			plot_title=L"Figure 3.25: Bifurcation in the $I_{\mathrm{Na,p}}$-model",
-			plot_titlefontsize=12,
-			layout=grid(3,2),
-			size=(600,800)
-		)
+		p1, p4, p2,
+		p5, p3, p6,
+		plot_title=L"Figure 3.25: Bifurcation in the $I_{\mathrm{Na,p}}$-model",
+		plot_titlefontsize=12,
+		layout=grid(3,2),
+		size=(600,800)
+	)
 end
 
 # ╔═╡ 69da4dc5-3931-4c84-b24e-3bccf76e6cb9
@@ -880,9 +880,9 @@ version = "17.0.6+0"
 
 [[deps.LZO_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "70c5da094887fd2cae843b8db33920bac4b6f07d"
+git-tree-sha1 = "854a9c268c43b77b0a27f22d7fab8d33cdb3a731"
 uuid = "dd4b983a-f0e5-5f8d-a1b7-129d4a5fb1ac"
-version = "2.10.2+0"
+version = "2.10.2+1"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "50901ebc375ed41dbf8058da26f9de442febbbec"
@@ -1921,9 +1921,9 @@ version = "1.2.12+3"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "e678132f07ddb5bfa46857f0d7620fb9be675d3b"
+git-tree-sha1 = "555d1076590a6cc2fdee2ef1469451f872d8b41b"
 uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
-version = "1.5.6+0"
+version = "1.5.6+1"
 
 [[deps.ZygoteRules]]
 deps = ["ChainRulesCore", "MacroTools"]
