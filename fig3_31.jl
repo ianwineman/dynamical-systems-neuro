@@ -4,77 +4,62 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 3928b98c-7dad-11ef-0209-5f340d9a25df
-using Plots, Roots
+# ╔═╡ 237263bc-7dc4-11ef-2416-fb4ed8389574
+using Plots, LaTeXStrings
 
-# ╔═╡ c65990a8-127e-4924-9a4e-f4885d61a788
+# ╔═╡ 0085a3e0-d9b7-44be-b283-cfaec7c32317
 begin
-	zeros_stable = []
-	zeros_unstable = []
-	
-	for I=0:0.1:16
-		C, gL, EL, gNa, Vhalf, k, ENa = [10, 19, -67, 74, 1.5, 16, 60]
-		m∞(V) = 1.0 / (1 + exp((Vhalf - V) / k))
-		
-		F(V) = (I - gL * (V - EL) - gNa * m∞(V) * (V - ENa)) / C
-
-		zero_stable = find_zero(F, -55)
-		zero_unstable = find_zero(F, -40)
-
-		if !(zero_stable ≈ zero_unstable)
-			push!(zeros_stable, zero_stable)
-			push!(zeros_unstable, zero_unstable)
-		else
-			push!(zeros_stable, -46.0)
-			push!(zeros_unstable, -46.0)
-		end
-	end
+	C, gL, EL, gNa, Vhalf, k, ENa = [10, 19, -67, 74, 1.5, 16, 60]
+	m∞(V) = 1.0 / (1 + exp((Vhalf - V) / k))
 	
 	plot(
-		collect(0:0.1:16), zeros_unstable, 
-		color=:blue, 
-		xlims=[0,25], ylims=[-55,-40], 
+		[V for V=-100:0.1:35], 
+		[gL * (V - EL) + gNa * m∞(V) * (V - ENa) for V=-100:0.1:35],
+		xlims=[-100,40],
+		ylims=[-900,300],
+		color=:maroon1,
+		label=L"I_∞(V)",
+		legendfontsize=10,
+		title="I-V Relation",
+		titlefontsize=12,
+		xguide="membrane potential, V (mV)",
+		yguide="steady-state current (pA)",
+		xguidefontsize=11,
+		yguidefontsize=11,
+		annotation=[
+			(-90, 16 + 30, ("I=16", 8)),
+			(-90, -100 + 30, ("I=-100", 8))
+		]
+	)
+
+	plot!(
+		[V for V=-100:0.1:35],
+		[16 for V=-100:0.1:35],
 		linestyle=:dash,
-		label="unstable equilibria"
+		color=:blue,
+		label=:none
 	)
 	plot!(
-		collect(0:0.1:16), zeros_stable, 
-		color=:blue, 
-		xlims=[0,25], ylims=[-55,-40],
-		label="stable equilibria",
-		xlabel="injected dc-current I, (pA)", ylabel="membrane potential, V (mV)",
-		xguidefontsize=10, yguidefontsize=10,
-		annotations = [
-			(16.5, -46.0, ("saddle-node (fold) bifurcation", :left, 8)),
-			(11.0, zeros_stable[Int(11/0.1)], ("●", 6)),
-			(12.0, zeros_stable[Int(12/0.1)], ("●", 6)),
-			(13.0, zeros_stable[Int(13/0.1)], ("●", 6)),
-			(14.0, zeros_stable[Int(14/0.1)], ("●", 6)),
-			(15.0, zeros_stable[Int(15/0.1)], ("●", 6)),
-			(11.0, zeros_unstable[Int(11/0.1)], ("○", 8)),
-			(12.0, zeros_unstable[Int(12/0.1)], ("○", 8)),
-			(13.0, zeros_unstable[Int(13/0.1)], ("○", 8)),
-			(14.0, zeros_unstable[Int(14/0.1)], ("○", 8)),
-			(15.0, zeros_unstable[Int(15/0.1)], ("○", 8)),
-			(16.0, -46.0, ("◐", 8))
-		]
+		[V for V=-100:0.1:35],
+		[-100 for V=-100:0.1:35],
+		linestyle=:dash,
+		color=:blue,
+		label=:none
 	)
 end
 
-# ╔═╡ 46abf18e-522b-4843-bcab-62e5253c3e65
-savefig("fig3_30.png")
+# ╔═╡ d041e884-7817-4b2e-a3db-8d1c421d5ee0
+savefig("fig3_31.png")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 
 [compat]
+LaTeXStrings = "~1.3.1"
 Plots = "~1.40.8"
-PlutoUI = "~0.7.60"
-Roots = "~2.2.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -83,19 +68,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "363d3769a1b60a06ae088a23e931be1b17f84bf5"
-
-[[deps.AbstractPlutoDingetjes]]
-deps = ["Pkg"]
-git-tree-sha1 = "6e1d2a35f2f90a4bc7c2ed98079b2ba09c35b83a"
-uuid = "6e696c72-6542-2067-7265-42206c756150"
-version = "1.3.2"
-
-[[deps.Accessors]]
-deps = ["CompositionsBase", "ConstructionBase", "Dates", "InverseFunctions", "LinearAlgebra", "MacroTools", "Markdown", "Requires", "Test"]
-git-tree-sha1 = "b392ede862e506d451fc1616e79aa6f4c673dab8"
-uuid = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
-version = "0.1.38"
+project_hash = "d3888f15c1823a7967337ce193faaf52481f0f1a"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -166,11 +139,6 @@ git-tree-sha1 = "362a287c3aa50601b0bc359053d5c2468f0e7ce0"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.12.11"
 
-[[deps.CommonSolve]]
-git-tree-sha1 = "0eee5eb66b1cf62cd6ad1b460238e60e4b09400c"
-uuid = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
-version = "0.2.4"
-
 [[deps.Compat]]
 deps = ["Dates", "LinearAlgebra", "TOML", "UUIDs"]
 git-tree-sha1 = "8ae8d32e09f0dcf42a36b90d4e17f5dd2e4c4215"
@@ -181,11 +149,6 @@ version = "4.16.0"
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "0.5.2+0"
-
-[[deps.CompositionsBase]]
-git-tree-sha1 = "802bb88cd69dfd1509f6670416bd4434015693ad"
-uuid = "a33af91c-f02d-484b-be07-31d278c5ca2b"
-version = "0.1.2"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -355,24 +318,6 @@ git-tree-sha1 = "401e4f3f30f43af2c8478fc008da50096ea5240f"
 uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
 version = "8.3.1+0"
 
-[[deps.Hyperscript]]
-deps = ["Test"]
-git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
-uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
-version = "0.0.5"
-
-[[deps.HypertextLiteral]]
-deps = ["Tricks"]
-git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
-uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.5"
-
-[[deps.IOCapture]]
-deps = ["Logging", "Random"]
-git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
-uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.5"
-
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
@@ -536,11 +481,6 @@ git-tree-sha1 = "c1dd6d7978c12545b4179fb6153b9250c96b0075"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.0.3"
 
-[[deps.MIMEs]]
-git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
-uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
-version = "0.1.4"
-
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
 git-tree-sha1 = "2fa9ee3e63fd3a4f7a9a4f4744a52f4856de82df"
@@ -680,12 +620,6 @@ git-tree-sha1 = "45470145863035bb124ca51b320ed35d071cc6c2"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.40.8"
 
-[[deps.PlutoUI]]
-deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "eba4810d5e6a01f612b948c9fa94f905b49087b0"
-uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.60"
-
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
 git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
@@ -762,12 +696,6 @@ deps = ["UUIDs"]
 git-tree-sha1 = "838a3a4188e2ded87a4f9f184b4b0d78a1e91cb7"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.3.0"
-
-[[deps.Roots]]
-deps = ["Accessors", "ChainRulesCore", "CommonSolve", "Printf"]
-git-tree-sha1 = "3a7c7e5c3f015415637f5debdf8a674aa2c979c4"
-uuid = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
-version = "2.2.1"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -846,11 +774,6 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 git-tree-sha1 = "e84b3a11b9bece70d14cce63406bbc79ed3464d2"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.11.2"
-
-[[deps.Tricks]]
-git-tree-sha1 = "7822b97e99a1672bfb1b49b668a6d46d58d8cbcb"
-uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
-version = "0.1.9"
 
 [[deps.URIs]]
 git-tree-sha1 = "67db6cc7b3821e19ebe75791a9dd19c9b1188f2b"
@@ -1185,8 +1108,8 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
-# ╠═3928b98c-7dad-11ef-0209-5f340d9a25df
-# ╠═c65990a8-127e-4924-9a4e-f4885d61a788
-# ╠═46abf18e-522b-4843-bcab-62e5253c3e65
+# ╠═237263bc-7dc4-11ef-2416-fb4ed8389574
+# ╠═0085a3e0-d9b7-44be-b283-cfaec7c32317
+# ╠═d041e884-7817-4b2e-a3db-8d1c421d5ee0
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
