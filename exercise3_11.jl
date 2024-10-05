@@ -43,9 +43,6 @@ for gL=-5:0.01:5
 	push!(gL_zeros, (gL, F_zeros, eigenvalues))
 end
 
-# ╔═╡ a0fa3404-54aa-4aaf-b942-cf0913b389a6
-gL_zeros
-
 # ╔═╡ 1202ab61-bb4d-40cd-bbe2-b1d3417624cd
 gL_points_stable = []
 
@@ -63,46 +60,86 @@ for i=gL_zeros
 	end
 end
 
-# ╔═╡ 269dd8f6-9ca9-4826-9e59-b508b27a8f77
-gL_points
-
 # ╔═╡ fa333166-359a-464c-9d10-6fa604d15502
 md"""
 ## (b) ``E_L`` as a bifurcation parameter
 """
 
 # ╔═╡ 2b59cae0-c6e6-4aae-afae-df4fe4dd1a51
-
+EL_zeros = []
 
 # ╔═╡ 9e8e4448-1e99-4e84-afaa-ca7d0f6d2033
-
+for EL=-150:0.01:-50
+	# See Equation 3.5 and Figure 3.39, page 55 and 86
+	gL = 1
+	F(V) = (I - gL * (V - EL) - gNa * m∞(V) * (V - ENa)) / C
+	
+	interval = (-150, 30)
+	F_zeros = find_zeros(F, interval...)
+	eigenvalues = ForwardDiff.derivative.(F, F_zeros)
+	
+	push!(EL_zeros, (EL, F_zeros, eigenvalues))
+end
 
 # ╔═╡ 402d97aa-5829-4422-bb7c-8b10a9ad8851
+EL_points_stable = []
 
+# ╔═╡ 9c40dcf3-d65c-4e03-ad20-df9c28489736
+EL_points_unstable = []
+
+# ╔═╡ 8330c339-cabf-4d80-987d-e76b05680dfd
+for i=EL_zeros
+	for (j, val) in enumerate(i[2])
+		if i[3][j] ≥ 0
+			push!(EL_points_unstable, (i[1], val))
+		else
+			push!(EL_points_stable, (i[1], val))
+		end
+	end
+end
 
 # ╔═╡ 6082cd0b-46a0-4a1e-8a61-f0fa19ccfd6f
 md"""
 ## Plotting
-plot both bifurcation diagrams side by side
 """
 
 # ╔═╡ 80b85f83-1660-491b-bbc7-b78adb2e3ed8
-plot(
-	[[i[1] for i=gL_points_stable], [i[1] for i=gL_points_unstable]],
-	[[i[2] for i=gL_points_stable], [i[2] for i=gL_points_unstable]],
-	seriestype=:scatter,
-	label=["stable" "unstable"],
-	color=[:blue :red],
-	title=L"Exercise 3.11: Bifurcation Diagram of the $I_{Na,p}$-model",
-	markersize=1,
-	markershape=:xcross,
-	xlabel=L"g_L",
-	ylabel=L"V",
-	ylims=[-200,1000]
-)
+begin
+	p1 = plot(
+		[[i[1] for i=gL_points_stable], [i[1] for i=gL_points_unstable]],
+		[[i[2] for i=gL_points_stable], [i[2] for i=gL_points_unstable]],
+		seriestype=:scatter,
+		label=["stable" "unstable"],
+		color=[:blue :red],
+		markersize=1,
+		markershape=:xcross,
+		xlabel=L"g_L",
+		ylabel=L"V",
+		ylims=[-200,1000]
+	)
+	
+	p2 = plot(
+		[[i[1] for i=EL_points_stable], [i[1] for i=EL_points_unstable]],
+		[[i[2] for i=EL_points_stable], [i[2] for i=EL_points_unstable]],
+		seriestype=:scatter,
+		label=["stable" "unstable"],
+		color=[:blue :red],
+		markersize=1,
+		markershape=:xcross,
+		xlabel=L"E_L",
+		ylabel=L"V",
+		ylims=[-160,30]
+	)
+	
+	plot(
+		p1, p2, 
+		plot_title=L"Exercise 3.11: Bifurcation Diagram of the $I_{Na,p}$-model",
+		plot_titlefontsize=12
+	)
+end
 
 # ╔═╡ aa0a24f7-1976-42a5-b27e-d1a092bdc90c
-
+savefig("exercise3_11.png")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1241,15 +1278,15 @@ version = "1.4.1+1"
 # ╟─e78cca0b-57ae-49d3-86f4-f18c55d3af47
 # ╠═b979fa5b-70b8-4f36-905b-f28845ec3bd7
 # ╠═dcfee263-a57e-45e0-92b5-5a1d320ec16f
-# ╠═a0fa3404-54aa-4aaf-b942-cf0913b389a6
 # ╠═1202ab61-bb4d-40cd-bbe2-b1d3417624cd
 # ╠═64974778-be3b-455b-accd-6fb5613b12c2
 # ╠═3e6b394f-85c3-4642-8d8c-1592887fa282
-# ╠═269dd8f6-9ca9-4826-9e59-b508b27a8f77
 # ╟─fa333166-359a-464c-9d10-6fa604d15502
 # ╠═2b59cae0-c6e6-4aae-afae-df4fe4dd1a51
 # ╠═9e8e4448-1e99-4e84-afaa-ca7d0f6d2033
 # ╠═402d97aa-5829-4422-bb7c-8b10a9ad8851
+# ╠═9c40dcf3-d65c-4e03-ad20-df9c28489736
+# ╠═8330c339-cabf-4d80-987d-e76b05680dfd
 # ╟─6082cd0b-46a0-4a1e-8a61-f0fa19ccfd6f
 # ╠═80b85f83-1660-491b-bbc7-b78adb2e3ed8
 # ╠═aa0a24f7-1976-42a5-b27e-d1a092bdc90c
