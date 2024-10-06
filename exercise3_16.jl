@@ -64,11 +64,14 @@ Plots.plot(
 	xlabel="a",
 	ylabel="b",
 	zlabel="x",
-	title="Exercise 3.16"
+	title="Exercise 3.16: Cusp Bifurcation"
 )
 
 # ╔═╡ 0f80acd3-2d4e-4d99-9c2a-14c5e3f22576
 Plots.savefig("exercise3_16.png")
+
+# ╔═╡ 06272573-ed2c-4629-b334-f3affb35dc73
+Plots.savefig("exercise3_16.html")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1321,5 +1324,6 @@ version = "1.4.1+1"
 # ╠═f8f5e6d1-3f52-4995-a0aa-d710a983e48c
 # ╠═b4f3612a-fe19-4ee2-8b7b-8b40749db5e1
 # ╠═0f80acd3-2d4e-4d99-9c2a-14c5e3f22576
+# ╠═06272573-ed2c-4629-b334-f3affb35dc73
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
