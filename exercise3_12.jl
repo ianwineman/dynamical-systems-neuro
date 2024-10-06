@@ -4,52 +4,53 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 399efcee-836b-11ef-0c73-b76846a27172
+# ╔═╡ db8439e2-8373-11ef-1ee4-cbba53f3c9a9
 using Plots, Roots, ForwardDiff, LaTeXStrings
 
-# ╔═╡ 9f38f1fb-eaf4-4dd9-b40d-9f7f70bb83b8
+# ╔═╡ 3722cbe1-8b17-4fed-9abc-d4eb87154a97
 md"""
-``C\dot V = I - g_L(V-E_L)-g_{Na}m_\infty(V)(V-E_{Na})``
+``C\dot V = I - g_L(V-E_L)-g_{Kir}h_\infty(V)(V-E_{K})``
 
-``m_\infty(V)= 1 / (1 + exp((V_{1/2}-V)/k))``
+``h_\infty(V)= \frac{1}{(1 + exp((V_{1/2}-V)/k))}``
 """
 
-# ╔═╡ 7248fb8c-39c6-4018-8668-35c53d5622cd
-C, I, gNa, ENa, Vhalf, k = [1, 0, 2.25, 60, -20, 15]
+# ╔═╡ 748e9d1d-c00a-427f-b70f-036251b4a356
+C, I, EL, EK, Vhalf, k  = [1, 6, -50, -80, -76, -12]
 
-# ╔═╡ bbf7d8cc-0e4a-4c04-8da7-ed76a075d72c
-function m∞(V)
+# ╔═╡ f65f7e2f-1f0c-4cb5-92b1-ce945cd25d97
+function h∞(V)
 	return 1 / (1 + exp((Vhalf - V) / k))
 end
 
-# ╔═╡ e78cca0b-57ae-49d3-86f4-f18c55d3af47
+# ╔═╡ 5e77f3e4-e148-46ef-b728-4385a498779d
 md"""
-## (a) ``g_L`` as a bifurcation parameter
+## 3.12.a
+``g_L`` as a bifurcation parameter
 """
 
-# ╔═╡ b979fa5b-70b8-4f36-905b-f28845ec3bd7
+# ╔═╡ ea29fe49-da6f-454b-9162-77c41880eb88
 gL_zeros = []
 
-# ╔═╡ dcfee263-a57e-45e0-92b5-5a1d320ec16f
-for gL=-5:0.01:5
-	# See Equation 3.5 and Figure 3.39, page 55 and 86
-	EL = -80
-	F(V) = (I - gL * (V - EL) - gNa * m∞(V) * (V - ENa)) / C
+# ╔═╡ b8dd5a6d-297f-474b-9527-42f36b1260d5
+for gL=-2.5:0.01:2.5
+	# See Equation 3.11 and Figure 3.38, page 85
+	gKir = 2
+	F(V) = (I - gL * (V - EL) - gKir * h∞(V) * (V - EK)) / C
 	
-	interval = (-120, 7000)
+	interval = (-600, 20)
 	F_zeros = find_zeros(F, interval...)
 	eigenvalues = ForwardDiff.derivative.(F, F_zeros)
 	
 	push!(gL_zeros, (gL, F_zeros, eigenvalues))
 end
 
-# ╔═╡ 1202ab61-bb4d-40cd-bbe2-b1d3417624cd
+# ╔═╡ e97ab5b7-0d0f-44b0-afc9-d4edf0363165
 gL_points_stable = []
 
-# ╔═╡ 64974778-be3b-455b-accd-6fb5613b12c2
+# ╔═╡ c4935ac7-7994-46f7-89df-f1650cca0b9b
 gL_points_unstable = []
 
-# ╔═╡ 3e6b394f-85c3-4642-8d8c-1592887fa282
+# ╔═╡ 3172a0ea-2f34-4636-ac7e-eb3b7e733ab9
 for i=gL_zeros
 	for (j, val) in enumerate(i[2])
 		if i[3][j] ≥ 0
@@ -60,50 +61,51 @@ for i=gL_zeros
 	end
 end
 
-# ╔═╡ fa333166-359a-464c-9d10-6fa604d15502
+# ╔═╡ b8578b3b-4fb2-4fa2-a229-5983f626afd0
 md"""
-## (b) ``E_L`` as a bifurcation parameter
+## 3.12.b
+``g_{Kir}`` as a bifurcation parameter
 """
 
-# ╔═╡ 2b59cae0-c6e6-4aae-afae-df4fe4dd1a51
-EL_zeros = []
+# ╔═╡ 4523ddbe-6710-4383-8cf6-d3f2fa1bbf52
+gKir_zeros = []
 
-# ╔═╡ 9e8e4448-1e99-4e84-afaa-ca7d0f6d2033
-for EL=-150:0.01:-50
-	# See Equation 3.5 and Figure 3.39, page 55 and 86
-	gL = 1
-	F(V) = (I - gL * (V - EL) - gNa * m∞(V) * (V - ENa)) / C
+# ╔═╡ bac5ebce-97d9-4e82-aa71-1cc31773222a
+for gKir=-5:0.01:5
+	# See Equation 3.11 and Figure 3.38, page 85
+	gL = 0.2
+	F(V) = (I - gL * (V - EL) - gKir * h∞(V) * (V - EK)) / C
 	
-	interval = (-150, 30)
+	interval = (-210, 0)
 	F_zeros = find_zeros(F, interval...)
 	eigenvalues = ForwardDiff.derivative.(F, F_zeros)
 	
-	push!(EL_zeros, (EL, F_zeros, eigenvalues))
+	push!(gKir_zeros, (gKir, F_zeros, eigenvalues))
 end
 
-# ╔═╡ 402d97aa-5829-4422-bb7c-8b10a9ad8851
-EL_points_stable = []
+# ╔═╡ bf6aabdf-fa5f-441e-8ed3-37c3fdbf4022
+gKir_points_stable = []
 
-# ╔═╡ 9c40dcf3-d65c-4e03-ad20-df9c28489736
-EL_points_unstable = []
+# ╔═╡ 3bd26034-f91e-429d-9b32-af830d96a683
+gKir_points_unstable = []
 
-# ╔═╡ 8330c339-cabf-4d80-987d-e76b05680dfd
-for i=EL_zeros
+# ╔═╡ 54a00d72-36d4-4b3a-9f07-7a099f9d698d
+for i=gKir_zeros
 	for (j, val) in enumerate(i[2])
 		if i[3][j] ≥ 0
-			push!(EL_points_unstable, (i[1], val))
+			push!(gKir_points_unstable, (i[1], val))
 		else
-			push!(EL_points_stable, (i[1], val))
+			push!(gKir_points_stable, (i[1], val))
 		end
 	end
 end
 
-# ╔═╡ 6082cd0b-46a0-4a1e-8a61-f0fa19ccfd6f
+# ╔═╡ 16563cd0-f9c2-446d-9df8-163ab097f1b6
 md"""
 ## Plotting
 """
 
-# ╔═╡ 80b85f83-1660-491b-bbc7-b78adb2e3ed8
+# ╔═╡ ec6d4afe-5a91-4390-88f7-3dc7dfc00b38
 begin
 	p1 = plot(
 		[[i[1] for i=gL_points_stable], [i[1] for i=gL_points_unstable]],
@@ -115,31 +117,32 @@ begin
 		markershape=:xcross,
 		xlabel=L"g_L",
 		ylabel=L"V",
-		ylims=[-200,1000]
+		ylims=[-600,20]
 	)
 	
 	p2 = plot(
-		[[i[1] for i=EL_points_stable], [i[1] for i=EL_points_unstable]],
-		[[i[2] for i=EL_points_stable], [i[2] for i=EL_points_unstable]],
+		[[i[1] for i=gKir_points_stable], [i[1] for i=gKir_points_unstable]],
+		[[i[2] for i=gKir_points_stable], [i[2] for i=gKir_points_unstable]],
 		seriestype=:scatter,
 		label=["stable" "unstable"],
 		color=[:blue :red],
 		markersize=1,
 		markershape=:xcross,
-		xlabel=L"E_L",
+		xlabel=L"g_{Kir}",
 		ylabel=L"V",
-		ylims=[-160,30]
+		ylims=[-210,0],
+		legend=:bottomright
 	)
 	
 	plot(
 		p1, p2, 
-		plot_title=L"Exercise 3.11: Bifurcation Diagram of the $I_{Na,p}$-model",
+		plot_title=L"Exercise 3.12: Bifurcation Diagram of the $I_{Kir}$-model",
 		plot_titlefontsize=12
 	)
 end
 
-# ╔═╡ aa0a24f7-1976-42a5-b27e-d1a092bdc90c
-savefig("exercise3_11.png")
+# ╔═╡ 4d49dd81-0712-4d48-bf17-339534042faa
+savefig("exercise3_12.png")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1271,24 +1274,24 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
-# ╠═399efcee-836b-11ef-0c73-b76846a27172
-# ╠═9f38f1fb-eaf4-4dd9-b40d-9f7f70bb83b8
-# ╠═7248fb8c-39c6-4018-8668-35c53d5622cd
-# ╠═bbf7d8cc-0e4a-4c04-8da7-ed76a075d72c
-# ╟─e78cca0b-57ae-49d3-86f4-f18c55d3af47
-# ╠═b979fa5b-70b8-4f36-905b-f28845ec3bd7
-# ╠═dcfee263-a57e-45e0-92b5-5a1d320ec16f
-# ╠═1202ab61-bb4d-40cd-bbe2-b1d3417624cd
-# ╠═64974778-be3b-455b-accd-6fb5613b12c2
-# ╠═3e6b394f-85c3-4642-8d8c-1592887fa282
-# ╟─fa333166-359a-464c-9d10-6fa604d15502
-# ╠═2b59cae0-c6e6-4aae-afae-df4fe4dd1a51
-# ╠═9e8e4448-1e99-4e84-afaa-ca7d0f6d2033
-# ╠═402d97aa-5829-4422-bb7c-8b10a9ad8851
-# ╠═9c40dcf3-d65c-4e03-ad20-df9c28489736
-# ╠═8330c339-cabf-4d80-987d-e76b05680dfd
-# ╟─6082cd0b-46a0-4a1e-8a61-f0fa19ccfd6f
-# ╠═80b85f83-1660-491b-bbc7-b78adb2e3ed8
-# ╠═aa0a24f7-1976-42a5-b27e-d1a092bdc90c
+# ╠═db8439e2-8373-11ef-1ee4-cbba53f3c9a9
+# ╟─3722cbe1-8b17-4fed-9abc-d4eb87154a97
+# ╠═748e9d1d-c00a-427f-b70f-036251b4a356
+# ╠═f65f7e2f-1f0c-4cb5-92b1-ce945cd25d97
+# ╟─5e77f3e4-e148-46ef-b728-4385a498779d
+# ╠═ea29fe49-da6f-454b-9162-77c41880eb88
+# ╠═b8dd5a6d-297f-474b-9527-42f36b1260d5
+# ╠═e97ab5b7-0d0f-44b0-afc9-d4edf0363165
+# ╠═c4935ac7-7994-46f7-89df-f1650cca0b9b
+# ╠═3172a0ea-2f34-4636-ac7e-eb3b7e733ab9
+# ╟─b8578b3b-4fb2-4fa2-a229-5983f626afd0
+# ╠═4523ddbe-6710-4383-8cf6-d3f2fa1bbf52
+# ╠═bac5ebce-97d9-4e82-aa71-1cc31773222a
+# ╠═bf6aabdf-fa5f-441e-8ed3-37c3fdbf4022
+# ╠═3bd26034-f91e-429d-9b32-af830d96a683
+# ╠═54a00d72-36d4-4b3a-9f07-7a099f9d698d
+# ╟─16563cd0-f9c2-446d-9df8-163ab097f1b6
+# ╠═ec6d4afe-5a91-4390-88f7-3dc7dfc00b38
+# ╠═4d49dd81-0712-4d48-bf17-339534042faa
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
