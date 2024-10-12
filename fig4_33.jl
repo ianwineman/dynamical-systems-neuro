@@ -5,7 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 1e5f3b89-829c-42d3-8b56-8a82f99d5bb0
-using DifferentialEquations, Plots
+using DifferentialEquations, Plots, Plots.PlotMeasures
 
 # ╔═╡ a8793966-8f11-4f5c-a98e-e5a976302637
 md"""
@@ -79,7 +79,8 @@ begin
 	plot(
 		p1, p2, layout=grid(2,1),
 		plot_title="Figure 4.33: Transition from the resting state to repetitive spiking\nin the \$I_{Na,p}+I_K\$-model with ramp injected current \$I\$",
-		plot_titlefontsize=10
+		plot_titlefontsize=10,
+		top_margin=3mm
 	)
 end
 
