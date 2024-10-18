@@ -11,6 +11,11 @@
 
 ![Figure 5.18](fig5_18.png)
 
+## Figure 5.8
+[Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/fig5_8.jl)
+
+![Figure 5.8](fig5_8.png)
+
 ## Figure 4.35b
 [Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/fig4_35b.jl)
 
