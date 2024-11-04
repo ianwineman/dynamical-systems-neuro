@@ -1,6 +1,11 @@
 # Dynamical Systems in Neuroscience
 [*The Geometry of Excitability and Bursting*](https://www.izhikevich.org/publications/dsn.pdf)
 
+## Figure 6.5
+[Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/fig6_5.jl)
+
+![Figure 6.5](fig6_5.png)
+
 ## Exercise 5.3b
 [Pluto Notebook](https://github.com/ianwineman/dynamical-systems-neuro/blob/main/exercise5_3b.jl)
 
