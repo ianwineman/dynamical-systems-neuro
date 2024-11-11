@@ -109,7 +109,7 @@ plot(
 	ylabel="membrane potential, v (mV)",
 	xguidefontsize=10,
 	yguidefontsize=10,
-	title="Figure 8.6a",
+	title="Figure 8.6a: simple model Equations (8.5, 8.6)",
 	titlefontsize=14
 )
 
