@@ -12,12 +12,14 @@ md"""
 See similar [example](https://docs.sciml.ai/DiffEqDocs/stable/features/callback_functions/#Example-2:-A-Control-Problem) from DifferentialEquations.jl docs.
 """
 
+# ╔═╡ 4ea38f57-4cf7-42d7-9a8d-0a51c3e5b82b
+global vpeak = 35
+
 # ╔═╡ 57c0acbf-c31d-4da0-97a0-56735e5a0655
 function model!(du, u, p, t)
 	C,vr,vt,k=[100,-60,-40,0.7] # parameters used for RS
 	a,b=[0.03,-2]               # neocortical pyramidal neurons
 	I = p
-
     du[1] = (I(t) + k * (u[1] - vr) * (u[1] - vt) - u[2]) / C
 	du[2] = a * (b * (u[1] - vr) - u[2])
 end
@@ -27,6 +29,9 @@ function vpeak_check(u, t, integrator)
 	vpeak = 35 # spike cutoff
 	u[1] ≥ vpeak 
 end
+
+# ╔═╡ 2f730721-20e5-4047-863f-b9bb737ff183
+saved_values = SavedValues(Float64, Tuple{Float64,Float64}) 
 
 # ╔═╡ a257b0e5-05f5-4865-ba48-7ef1f40ce6cd
 function affect!(integrator)
@@ -55,7 +60,8 @@ sol = solve(prob, Tsit5(), callback = cbs)
 
 # ╔═╡ 3cf6889c-de0b-46ee-8a6b-e13d89285e7f
 plot(
-	sol, idxs=(0,1),
+	sol.t,
+	[i≥35 ? vpeak : i for i=sol[1, :]],
 	color=:firebrick1,
 	linewidth=1.2,
 	ylim=[-65,45],
@@ -70,10 +76,8 @@ plot(
 	titlefontsize=12
 ) 
 
-# ╔═╡ 2f804107-b9ff-4362-b534-cd70a58d717c
-md"""
-Note that the action potential amplitudes are not all identically equal to ``V_{peak}``. Instead of resetting `v(i)=vpeak; v(i+1)=c;` we do the equivalent of just `v(i)=c`. This should be able to be addressed with further refinement.
-"""
+# ╔═╡ 37f9b2c5-7d23-42e1-936d-424678d3ebda
+savefig("plots/fig8_6a_callback")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1893,14 +1897,16 @@ version = "1.4.1+1"
 # ╔═╡ Cell order:
 # ╠═e8606bf4-5f83-4093-96e6-b16f9acaa03d
 # ╟─0b82c0b7-b63a-403c-b0df-a4eebaf96581
+# ╠═4ea38f57-4cf7-42d7-9a8d-0a51c3e5b82b
 # ╠═57c0acbf-c31d-4da0-97a0-56735e5a0655
 # ╠═c8db1d15-a559-4953-a0e5-4bfc7a554cab
+# ╠═2f730721-20e5-4047-863f-b9bb737ff183
 # ╠═a257b0e5-05f5-4865-ba48-7ef1f40ce6cd
 # ╠═11611abd-8eee-413f-ad68-d69a9bc28686
 # ╠═0e20aacb-b06c-4349-83aa-bc4cdc309432
 # ╠═780781d6-425f-4d07-a850-3fa7adebc60e
 # ╠═58d103a8-984b-44ee-b08b-28a917edd631
 # ╠═3cf6889c-de0b-46ee-8a6b-e13d89285e7f
-# ╟─2f804107-b9ff-4362-b534-cd70a58d717c
+# ╠═37f9b2c5-7d23-42e1-936d-424678d3ebda
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
