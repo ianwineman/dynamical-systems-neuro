@@ -26,17 +26,12 @@ end
 
 # ╔═╡ c8db1d15-a559-4953-a0e5-4bfc7a554cab
 function vpeak_check(u, t, integrator)
-	vpeak = 35 # spike cutoff
 	u[1] ≥ vpeak 
 end
-
-# ╔═╡ 2f730721-20e5-4047-863f-b9bb737ff183
-saved_values = SavedValues(Float64, Tuple{Float64,Float64}) 
 
 # ╔═╡ a257b0e5-05f5-4865-ba48-7ef1f40ce6cd
 function affect!(integrator)
 	c, d = [-50,100] # neocortical pyramidal neurons
-	vpeak = 35       # spike cutoff
     integrator.u[1] = c
 	integrator.u[2] += d
 end
@@ -77,7 +72,7 @@ plot(
 ) 
 
 # ╔═╡ 37f9b2c5-7d23-42e1-936d-424678d3ebda
-savefig("plots/fig8_6a_callback")
+savefig("../plots/fig8_6a_callback")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1900,7 +1895,6 @@ version = "1.4.1+1"
 # ╠═4ea38f57-4cf7-42d7-9a8d-0a51c3e5b82b
 # ╠═57c0acbf-c31d-4da0-97a0-56735e5a0655
 # ╠═c8db1d15-a559-4953-a0e5-4bfc7a554cab
-# ╠═2f730721-20e5-4047-863f-b9bb737ff183
 # ╠═a257b0e5-05f5-4865-ba48-7ef1f40ce6cd
 # ╠═11611abd-8eee-413f-ad68-d69a9bc28686
 # ╠═0e20aacb-b06c-4349-83aa-bc4cdc309432
